@@ -1,3 +1,6 @@
+# base
+.idea/
+
 # Gradle files
 .gradle/
 build/
