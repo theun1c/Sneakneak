@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sneakneak.ui.screens.MainScreen
+import com.example.sneakneak.ui.screens.RegisterScreen
 import com.example.sneakneak.ui.screens.SplashScreen
 
 @Composable
@@ -27,6 +28,11 @@ fun Navigation(){
         // Main screen
         composable("main_screen") {
             MainScreen(navController = navController)
+        }
+
+        // Register screen
+        composable("register_screen"){
+            RegisterScreen()
         }
     }
 }
