@@ -40,7 +40,7 @@ fun SplashScreen(navController: NavController) {
             )
         )
         delay(1200L)
-        navController.navigate("main_screen")
+        navController.navigate("register_screen")
     }
 
     // Img
