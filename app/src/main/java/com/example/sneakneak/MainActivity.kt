@@ -1,6 +1,7 @@
 package com.example.sneakneak
 
 import android.os.Bundle
+import android.text.style.BackgroundColorSpan
 import android.view.animation.OvershootInterpolator
 import android.window.SplashScreen
 import androidx.activity.ComponentActivity
@@ -8,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -97,6 +99,7 @@ fun SplashScreen(navController: NavController) {
     // Img
     Box(contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
+            .background(color = Color(0xFF48B2E7)),
     ){
         Image(painter = painterResource(id = R.drawable.logo_foreground),
             contentDescription = "Logo",
