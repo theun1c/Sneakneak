@@ -1,38 +1,86 @@
 package com.example.sneakneak.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.sneakneak.ui.screens.MainScreen
-import com.example.sneakneak.ui.screens.RegisterScreen
-import com.example.sneakneak.ui.screens.SplashScreen
+import androidx.navigation.navArgument
+import com.example.sneakneak.ui.auth.forgot.ForgotPasswordRoute
+import com.example.sneakneak.ui.auth.newpassword.NewPasswordRoute
+import com.example.sneakneak.ui.auth.otp.OtpRoute
+import com.example.sneakneak.ui.auth.signin.SignInRoute
+import com.example.sneakneak.ui.auth.signup.SignUpRoute
+import com.example.sneakneak.ui.auth.splash.SplashRoute
+import com.example.sneakneak.ui.main.mainNavGraph
+
+// Root navigation host for the current UI stage.
+// Auth and main flows are already split, while transitions still run on mock session state.
+@Composable
+fun Navigation() = AppNavHost()
 
 @Composable
-fun Navigation(){
+fun AppNavHost() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "splash_screen") {
-        // Splash screen
-        composable("splash_screen") {
-            SplashScreen(navController = navController)
+    NavHost(navController = navController, startDestination = AppRoutes.Splash.route) {
+        composable(AppRoutes.Splash.route) {
+            // TODO(DATA): route selection should stay here, but the source of truth must become
+            // a real session observer once Supabase auth is connected.
+            SplashRoute(
+                onNavigateToSignIn = { navController.mockReplace(AppRoutes.SignIn.route) },
+                onNavigateToHome = { navController.mockReplace(AppRoutes.Home.route) },
+            )
         }
-
-        // Main screen
-        composable("main_screen") {
-            MainScreen(navController = navController)
+        composable(AppRoutes.SignIn.route) {
+            SignInRoute(
+                onForgotPassword = { navController.mockNavigate(AppRoutes.ForgotPassword.route) },
+                onCreateAccount = { navController.mockNavigate(AppRoutes.SignUp.route) },
+                onSignInSuccess = { navController.mockReplace(AppRoutes.Home.route) },
+            )
         }
-
-        // Register screen
-        composable("register_screen"){
-            RegisterScreen()
+        composable(AppRoutes.SignUp.route) {
+            SignUpRoute(
+                onBack = { navController.popBackStack() },
+                onNavigateToSignIn = { navController.popBackStack(AppRoutes.SignIn.route, false) },
+            )
         }
+        composable(AppRoutes.ForgotPassword.route) {
+            ForgotPasswordRoute(
+                onBack = { navController.popBackStack() },
+                onNavigateToOtp = { email -> navController.mockNavigate(AppRoutes.otp(email)) },
+            )
+        }
+        composable(
+            route = AppRoutes.Otp.route,
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            ),
+        ) { backStackEntry ->
+            OtpRoute(
+                email = backStackEntry.arguments?.getString("email").orEmpty(),
+                onBack = { navController.popBackStack() },
+                onNavigateToNewPassword = { email -> navController.mockNavigate(AppRoutes.newPassword(email)) },
+            )
+        }
+        composable(
+            route = AppRoutes.NewPassword.route,
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+            ),
+        ) {
+            NewPasswordRoute(
+                email = it.arguments?.getString("email").orEmpty(),
+                onBack = { navController.popBackStack() },
+                onNavigateToSignIn = { navController.mockReplace(AppRoutes.SignIn.route) },
+            )
+        }
+        mainNavGraph(navController)
     }
 }
