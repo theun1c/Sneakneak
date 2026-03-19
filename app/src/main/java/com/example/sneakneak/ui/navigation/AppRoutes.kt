@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.navigation
 
+// Единый реестр маршрутов приложения.
+// Используется и auth-графом, и main-графом для консистентной навигации.
 sealed class AppRoutes(val route: String) {
     data object Splash : AppRoutes("splash")
     data object SignIn : AppRoutes("auth/signin")
