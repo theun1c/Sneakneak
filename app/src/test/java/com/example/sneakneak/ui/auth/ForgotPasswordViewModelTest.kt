@@ -2,6 +2,8 @@ package com.example.sneakneak.ui.auth
 
 import com.example.sneakneak.data.auth.FakeAuthRepository
 import com.example.sneakneak.domain.auth.usecase.AuthUseCases
+import com.example.sneakneak.domain.auth.usecase.GetCurrentUserEmailUseCase
+import com.example.sneakneak.domain.auth.usecase.GetCurrentUserIdUseCase
 import com.example.sneakneak.domain.auth.usecase.ObserveSessionUseCase
 import com.example.sneakneak.domain.auth.usecase.SendRecoveryCodeUseCase
 import com.example.sneakneak.domain.auth.usecase.SignInWithEmailUseCase
@@ -30,6 +32,8 @@ class ForgotPasswordViewModelTest {
             updatePassword = UpdatePasswordUseCase(repository),
             observeSession = ObserveSessionUseCase(repository),
             signOut = SignOutUseCase(repository),
+            getCurrentUserId = GetCurrentUserIdUseCase(repository),
+            getCurrentUserEmail = GetCurrentUserEmailUseCase(repository),
         )
     }
 
