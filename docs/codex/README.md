@@ -9,8 +9,6 @@
 - `docs/02_ARCHITECTURE.md` — техническая архитектура и структура проекта.
 - `docs/03_SUPABASE_CONTRACT.md` — целевой контракт с Supabase, схема данных и RLS.
 - `docs/04_IMPLEMENTATION_PLAN.md` — план реализации по этапам.
-- `docs/05_QA_CHECKLIST.md` — чек-лист приемки и тестирования.
-- `docs/06_DECISIONS.md` — принятые допущения и разбор противоречий в исходных материалах.
 
 ## Как использовать
 
@@ -18,12 +16,10 @@
 2. Папку `docs/` положить в репозиторий, например в `docs/codex/`.
 3. Перед генерацией кода читать файлы в таком порядке:
    1. `AGENTS.md`
-   2. `docs/06_DECISIONS.md`
-   3. `docs/02_ARCHITECTURE.md`
-   4. `docs/03_SUPABASE_CONTRACT.md`
-   5. `docs/01_SPECIFICATION.md`
-   6. `docs/04_IMPLEMENTATION_PLAN.md`
-   7. `docs/05_QA_CHECKLIST.md`
+   2. `docs/02_ARCHITECTURE.md`
+   3. `docs/03_SUPABASE_CONTRACT.md`
+   4. `docs/01_SPECIFICATION.md`
+   5. `docs/04_IMPLEMENTATION_PLAN.md`
 
 ## Приоритет источников истины
 
