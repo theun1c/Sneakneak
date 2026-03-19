@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.theme
 
+// Shape-токены дизайн-системы приложения.
+
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.ui.unit.dp
