@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.theme
 
+// Палитра приложения (единственный источник цветовых токенов для Compose UI).
+
 import androidx.compose.ui.graphics.Color
 
 object AppColors {
