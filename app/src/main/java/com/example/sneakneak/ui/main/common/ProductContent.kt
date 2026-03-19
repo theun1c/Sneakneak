@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.main.common
 
+// Переиспользуемые блоки отображения каталожных карточек: секции, grid и empty-state.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -21,7 +24,7 @@ import androidx.compose.material3.Text
 
 @Composable
 fun ProductPairRow(
-    products: List<MockProduct>,
+    products: List<CatalogProductUiModel>,
     onFavoriteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -33,9 +36,10 @@ fun ProductPairRow(
             ProductCard(
                 title = product.title,
                 price = product.price,
+                imageUrl = product.imageUrl,
                 modifier = Modifier.weight(1f),
                 isBestSeller = product.isBestSeller,
-                isFavorite = MockCatalogState.isFavorite(product.id),
+                isFavorite = product.isFavorite,
                 onFavoriteClick = { onFavoriteClick(product.id) },
             )
         }
@@ -46,6 +50,7 @@ fun ProductPairRow(
 fun ProductSectionHeader(
     title: String,
     action: String? = null,
+    onActionClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -60,6 +65,11 @@ fun ProductSectionHeader(
         if (action != null) {
             Text(
                 text = action,
+                modifier = if (onActionClick != null) {
+                    Modifier.clickable(onClick = onActionClick)
+                } else {
+                    Modifier
+                },
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = AppColors.Primary,
             )
@@ -69,7 +79,7 @@ fun ProductSectionHeader(
 
 @Composable
 fun ProductsGrid(
-    products: List<MockProduct>,
+    products: List<CatalogProductUiModel>,
     onFavoriteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -83,8 +93,9 @@ fun ProductsGrid(
             ProductCard(
                 title = product.title,
                 price = product.price,
+                imageUrl = product.imageUrl,
                 isBestSeller = product.isBestSeller,
-                isFavorite = MockCatalogState.isFavorite(product.id),
+                isFavorite = product.isFavorite,
                 onFavoriteClick = { onFavoriteClick(product.id) },
             )
         }

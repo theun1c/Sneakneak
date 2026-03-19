@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Унифицированная кнопка "назад" для auth и main экранов.
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.sneakneak.ui.theme.AppColors

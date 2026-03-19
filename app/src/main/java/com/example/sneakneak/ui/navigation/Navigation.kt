@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.navigation
 
+// Корневой NavHost приложения.
+// Здесь разделяются auth-экран и основной main-граф после входа.
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost

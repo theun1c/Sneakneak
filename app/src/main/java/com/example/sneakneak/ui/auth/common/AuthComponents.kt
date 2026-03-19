@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.auth.common
 
+// Переиспользуемые composable-компоненты auth-графа.
+// Содержат только UI и не знают о domain/data логике.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

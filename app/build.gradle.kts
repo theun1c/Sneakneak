@@ -1,8 +1,34 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
+
+val localProperties = Properties().apply {
+    val propertiesFile = rootProject.file("local.properties")
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use(::load)
+    }
+}
+
+fun stringBuildConfig(value: String): String = "\"${value.replace("\"", "\\\"")}\""
+
+val supabaseUrl = (
+    localProperties.getProperty("SUPABASE_URL")
+        ?: providers.gradleProperty("SUPABASE_URL").orNull
+        ?: System.getenv("SUPABASE_URL")
+        ?: ""
+).trim()
+
+val supabaseAnonKey = (
+    localProperties.getProperty("SUPABASE_ANON_KEY")
+        ?: providers.gradleProperty("SUPABASE_ANON_KEY").orNull
+        ?: System.getenv("SUPABASE_ANON_KEY")
+        ?: ""
+).trim()
 
 android {
     namespace = "com.example.sneakneak"
@@ -16,6 +42,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Injected from local.properties / gradle.properties / env vars.
+        // Keep empty defaults so the app can still build for UI-only work.
+        buildConfigField("String", "SUPABASE_URL", stringBuildConfig(supabaseUrl))
+        buildConfigField("String", "SUPABASE_ANON_KEY", stringBuildConfig(supabaseAnonKey))
     }
 
     buildTypes {
@@ -36,6 +67,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -49,6 +81,14 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.core)
+    implementation(libs.supabase.auth)
+    implementation(libs.supabase.postgrest)
+    implementation(libs.supabase.storage)
+    implementation(libs.ktor.client.android)
+    implementation(libs.coil.compose)
+    implementation(libs.zxing.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

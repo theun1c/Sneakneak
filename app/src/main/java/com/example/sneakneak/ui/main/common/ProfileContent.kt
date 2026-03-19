@@ -1,5 +1,9 @@
 package com.example.sneakneak.ui.main.common
 
+// Переиспользуемые UI-блоки profile/loyalty экранов.
+// Содержит header, поля профиля и визуализацию штрихкода.
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.example.sneakneak.ui.components.AppIcon
 import com.example.sneakneak.ui.components.AppIconAsset
@@ -32,13 +39,18 @@ import com.example.sneakneak.ui.theme.AppColors
 fun ProfileHeaderBlock(
     fullName: String,
     modifier: Modifier = Modifier,
+    avatarUrl: String? = null,
     subtitle: String? = null,
+    onSubtitleClick: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ProfileAvatar(name = fullName)
+        ProfileAvatar(
+            name = fullName,
+            imageUrl = avatarUrl,
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = fullName,
@@ -49,6 +61,11 @@ fun ProfileHeaderBlock(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = subtitle,
+                modifier = if (onSubtitleClick != null) {
+                    Modifier.clickable(onClick = onSubtitleClick)
+                } else {
+                    Modifier
+                },
                 color = AppColors.Primary,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -87,21 +104,14 @@ fun ProfileBarcodeCard(
                     color = AppColors.TextSecondary,
                 )
             }
-            Row(
+            Box(
                 modifier = Modifier
-                    .height(44.dp)
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(3.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .height(52.dp)
+                    .width(88.dp)
+                    .background(AppColors.SurfaceVariant, MaterialTheme.shapes.medium),
+                contentAlignment = Alignment.Center,
             ) {
-                repeat(16) { index ->
-                    Box(
-                        modifier = Modifier
-                            .height(if (index % 3 == 0) 42.dp else 28.dp)
-                            .width(if (index % 2 == 0) 3.dp else 2.dp)
-                            .background(Color.Black),
-                    )
-                }
+                MiniBarcodePlaceholder()
             }
             Spacer(modifier = Modifier.width(10.dp))
             Box(
@@ -162,6 +172,28 @@ fun ProfileFieldList(
 }
 
 @Composable
+private fun MiniBarcodePlaceholder() {
+    // Превью в карточке профиля является стилизованной имитацией, реальный штрихкод строится на Loyalty screen.
+    Row(
+        modifier = Modifier
+            .height(42.dp)
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val pattern = listOf(2, 1, 3, 1, 2, 1, 4, 1, 2, 1, 3, 1, 2)
+        pattern.forEachIndexed { index, widthUnits ->
+            Box(
+                modifier = Modifier
+                    .height(if (index % 4 == 0) 40.dp else 28.dp)
+                    .width((widthUnits + 1).dp)
+                    .background(AppColors.TextPrimary),
+            )
+        }
+    }
+}
+
+@Composable
 private fun ProfileField(
     label: String,
     value: String,
@@ -189,6 +221,8 @@ private fun ProfileField(
 @Composable
 fun LoyaltyBarcodeBlock(
     modifier: Modifier = Modifier,
+    barcodeImage: ImageBitmap? = null,
+    barcodeLabel: String? = null,
 ) {
     Card(
         modifier = modifier
@@ -197,42 +231,48 @@ fun LoyaltyBarcodeBlock(
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
     ) {
+        val contentHorizontalPadding = if (barcodeImage != null) 6.dp else 18.dp
+        val contentVerticalPadding = if (barcodeImage != null) 4.dp else 24.dp
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 18.dp, vertical = 24.dp),
+                .padding(horizontal = contentHorizontalPadding, vertical = contentVerticalPadding),
             contentAlignment = Alignment.Center,
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(0.82f),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                repeat(32) { rowIndex ->
+            if (barcodeImage != null) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(
-                                when {
-                                    rowIndex % 7 == 0 -> 0.88f
-                                    rowIndex % 5 == 0 -> 0.96f
-                                    else -> 1f
-                                }
-                            )
-                            .align(
-                                when {
-                                    rowIndex % 6 == 0 -> Alignment.End
-                                    rowIndex % 4 == 0 -> Alignment.Start
-                                    else -> Alignment.CenterHorizontally
-                                }
-                            )
-                            .height(
-                                when {
-                                    rowIndex % 4 == 0 -> 10.dp
-                                    rowIndex % 3 == 0 -> 8.dp
-                                    else -> 6.dp
-                                }
-                            )
-                            .background(Color.Black),
-                    )
+                            .fillMaxHeight()
+                            .fillMaxWidth(0.98f),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Image(
+                            bitmap = barcodeImage,
+                            contentDescription = "Штрихкод карты лояльности",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer {
+                                    rotationZ = 90f
+                                    scaleX = 2.4f
+                                    scaleY = 1.58f
+                                },
+                            contentScale = ContentScale.FillBounds,
+                        )
+                    }
+                    if (!barcodeLabel.isNullOrBlank()) {
+                        Text(
+                            text = barcodeLabel,
+                            modifier = Modifier.padding(top = 10.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppColors.TextSecondary,
+                        )
+                    }
                 }
             }
         }

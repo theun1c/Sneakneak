@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.screens
 
+// Универсальная простая заглушка для маршрутов, которые еще не реализованы полноценно.
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme

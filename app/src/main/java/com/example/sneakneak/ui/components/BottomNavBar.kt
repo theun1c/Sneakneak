@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.components
 
+// Нижняя навигация main-части приложения.
+// Каталог рендерится отдельной центральной кнопкой, остальные маршруты идут обычными иконками.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

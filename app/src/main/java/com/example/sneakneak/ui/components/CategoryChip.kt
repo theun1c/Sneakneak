@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Переиспользуемый чип категории для Home/Catalog фильтрации.
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding

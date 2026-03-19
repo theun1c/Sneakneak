@@ -28,7 +28,7 @@ class FakeAuthRepositoryTest {
 
         repository.sendRecoveryCode("demo@sneakneak.com")
         repository.verifyRecoveryCode("demo@sneakneak.com", FakeAuthRepository.DEFAULT_RECOVERY_CODE)
-        repository.updatePassword("demo@sneakneak.com", "newpassword123")
+        repository.updatePassword("newpassword123")
         val result = repository.signIn("demo@sneakneak.com", "newpassword123")
 
         assert(result is AuthResult.Success)

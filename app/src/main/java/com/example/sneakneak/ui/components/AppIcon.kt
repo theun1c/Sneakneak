@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Каталог иконок и универсальные icon-button компоненты проекта.
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

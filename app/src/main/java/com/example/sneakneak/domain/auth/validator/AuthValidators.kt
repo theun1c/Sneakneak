@@ -2,6 +2,8 @@ package com.example.sneakneak.domain.auth.validator
 
 import com.example.sneakneak.domain.auth.model.ValidationResult
 
+// Централизованные валидаторы auth.
+// Вынесены в domain, чтобы не дублировать правила в composable и view model.
 private val emailRegex = Regex("^[a-z0-9]+@[a-z0-9]+\\.[a-z]{2,}$")
 
 object EmailValidator {
@@ -44,11 +46,13 @@ object ConfirmPasswordValidator {
 }
 
 object OtpCodeValidator {
+    private val allowedLengths = setOf(6, 8)
+
     fun validate(code: String): ValidationResult {
-        return if (code.length == 6 && code.all(Char::isDigit)) {
+        return if (code.length in allowedLengths && code.all(Char::isDigit)) {
             ValidationResult.Valid
         } else {
-            ValidationResult.Invalid("Введите 6-значный код")
+            ValidationResult.Invalid("Введите 6- или 8-значный код")
         }
     }
 }

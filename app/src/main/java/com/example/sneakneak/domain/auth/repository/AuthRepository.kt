@@ -4,13 +4,15 @@ import com.example.sneakneak.domain.auth.model.AuthResult
 import com.example.sneakneak.domain.auth.model.AuthSession
 import kotlinx.coroutines.flow.StateFlow
 
+// Domain-контракт auth.
+// Presentation работает только с этим интерфейсом, а конкретная реализация (Supabase/Fake) выбирается в DI.
 interface AuthRepository {
     fun observeSession(): StateFlow<AuthSession?>
 
     suspend fun signUp(
-        name: String,
         email: String,
         password: String,
+        nameHint: String? = null,
     ): AuthResult<Unit>
 
     suspend fun signIn(
@@ -25,10 +27,11 @@ interface AuthRepository {
         code: String,
     ): AuthResult<Unit>
 
-    suspend fun updatePassword(
-        email: String,
-        newPassword: String,
-    ): AuthResult<Unit>
+    suspend fun updatePassword(newPassword: String): AuthResult<Unit>
 
     suspend fun signOut(): AuthResult<Unit>
+
+    suspend fun getCurrentUserId(): String?
+
+    suspend fun getCurrentUserEmail(): String?
 }

@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.auth.signup
 
+// Экран и ViewModel регистрации.
+// UI собирает name/email/password, а domain решает валидацию и передачу `nameHint` в profile bootstrap.
+
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -66,8 +69,6 @@ sealed interface SignUpUiEffect {
     data object NavigateToSignIn : SignUpUiEffect
 }
 
-// TODO(DATA): replace mock registration result with repository-backed sign-up while preserving
-// the same button enablement and dialog/navigation contract.
 class SignUpViewModel(
     private val useCases: AuthUseCases,
     dispatcher: CoroutineDispatcher = Dispatchers.Main,

@@ -2,8 +2,8 @@ package com.example.sneakneak.ui.main.common
 
 import androidx.compose.runtime.mutableStateListOf
 
-// Temporary in-memory catalog/favorite source for the UI stage.
-// TODO(DATA): replace with repositories/use cases so screen state is no longer owned by a UI singleton.
+// Temporary in-memory source kept only for Favorite dev fallback.
+// Home/Catalog screens now read real data through repository/use case flow.
 data class MockProduct(
     val id: String,
     val title: String,

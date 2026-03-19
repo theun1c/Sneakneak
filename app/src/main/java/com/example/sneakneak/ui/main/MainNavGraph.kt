@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.main
 
+// Навигационный граф авторизованной части приложения (main shell).
+// Внутри связываются Home/Catalog/Favorite/Profile/Loyalty и экран редактирования профиля.
+
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -28,7 +31,7 @@ import com.example.sneakneak.ui.navigation.mockReplace
 import kotlinx.coroutines.launch
 
 // Main graph hosts the post-auth shell.
-// Drawer/bottom-nav navigation is already wired, while most data shown by screens remains mock-backed.
+// Home/Catalog/Profile now resolve data through repositories; remaining placeholders stay isolated.
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
 ) {
@@ -151,8 +154,7 @@ private fun rememberMainDrawerNavigate(
         { route ->
             if (route == AppRoutes.Logout.route) {
                 scope.launch {
-                    // TODO(DATA): keep this navigation contract, but replace fake signOut with
-                    // repository-backed logout once auth is connected to Supabase.
+                    // Uses repository signOut (Supabase when configured, fake fallback otherwise).
                     AppContainer.authUseCases.signOut()
                     navController.mockReplace(AppRoutes.SignIn.route)
                 }

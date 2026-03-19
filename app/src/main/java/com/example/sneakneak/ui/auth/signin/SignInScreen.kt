@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.auth.signin
 
+// Экран и ViewModel входа.
+// Поток: UI event -> AuthUseCases.signInWithEmail -> UiState/UiEffect.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -60,8 +63,7 @@ sealed interface SignInUiEffect {
     data object NavigateToHome : SignInUiEffect
 }
 
-// TODO(DATA): keep the state/effect contract, but move coroutine launching to viewModelScope
-// and inject a real repository-backed AuthUseCases implementation in the data stage.
+// TODO(DATA): move coroutine launching to viewModelScope once shared ViewModel base is introduced.
 class SignInViewModel(
     private val useCases: AuthUseCases,
     dispatcher: CoroutineDispatcher = Dispatchers.Main,

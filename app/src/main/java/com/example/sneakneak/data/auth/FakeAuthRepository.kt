@@ -1,5 +1,7 @@
 package com.example.sneakneak.data.auth
 
+// Слой data/auth: fallback-реализация репозитория без сети.
+
 import com.example.sneakneak.domain.auth.model.AuthResult
 import com.example.sneakneak.domain.auth.model.AuthSession
 import com.example.sneakneak.domain.auth.model.AuthUser
@@ -15,8 +17,8 @@ private data class StoredUser(
     var password: String,
 )
 
-// In-memory auth implementation used to exercise the full UI flow without network/Supabase.
-// It is intentionally deterministic so screenshots, QA checks and handoff remain reproducible.
+// Fake-реализация AuthRepository для offline/dev режима.
+// Нужна как безопасный fallback, когда Supabase не настроен или недоступен.
 class FakeAuthRepository : AuthRepository {
     private val users = mutableListOf(
         StoredUser(
@@ -29,21 +31,21 @@ class FakeAuthRepository : AuthRepository {
 
     private val activeSession = MutableStateFlow<AuthSession?>(null)
     private val recoveryCodes = mutableMapOf<String, String>()
-    private val verifiedRecoveryEmails = mutableSetOf<String>()
+    private var verifiedRecoveryEmail: String? = null
 
     override fun observeSession(): StateFlow<AuthSession?> = activeSession.asStateFlow()
 
     override suspend fun signUp(
-        name: String,
         email: String,
         password: String,
+        nameHint: String?,
     ): AuthResult<Unit> {
         if (users.any { it.email == email }) {
             return AuthResult.Error("Пользователь с таким email уже существует")
         }
         users += StoredUser(
             id = "mock-user-${users.size + 1}",
-            name = name.ifBlank { email.substringBefore("@") },
+            name = nameHint?.trim().takeUnless { it.isNullOrEmpty() } ?: email.substringBefore("@"),
             email = email,
             password = password,
         )
@@ -77,7 +79,7 @@ class FakeAuthRepository : AuthRepository {
         }
         // TODO(DATA): replace fixed OTP with backend-generated recovery token.
         recoveryCodes[email] = DEFAULT_RECOVERY_CODE
-        verifiedRecoveryEmails.remove(email)
+        verifiedRecoveryEmail = null
         return AuthResult.Success(Unit)
     }
 
@@ -90,15 +92,13 @@ class FakeAuthRepository : AuthRepository {
         if (expectedCode != code) {
             return AuthResult.Error("Неверный код")
         }
-        verifiedRecoveryEmails += email
+        verifiedRecoveryEmail = email
         return AuthResult.Success(Unit)
     }
 
-    override suspend fun updatePassword(
-        email: String,
-        newPassword: String,
-    ): AuthResult<Unit> {
-        if (!verifiedRecoveryEmails.contains(email)) {
+    override suspend fun updatePassword(newPassword: String): AuthResult<Unit> {
+        val email = verifiedRecoveryEmail
+        if (email == null) {
             return AuthResult.Error("Сначала подтвердите код восстановления")
         }
         val index = users.indexOfFirst { it.email == email }
@@ -106,7 +106,7 @@ class FakeAuthRepository : AuthRepository {
             return AuthResult.Error("Пользователь с таким email не найден")
         }
         users[index] = users[index].copy(password = newPassword)
-        verifiedRecoveryEmails.remove(email)
+        verifiedRecoveryEmail = null
         recoveryCodes.remove(email)
         activeSession.value = null
         return AuthResult.Success(Unit)
@@ -116,6 +116,10 @@ class FakeAuthRepository : AuthRepository {
         activeSession.value = null
         return AuthResult.Success(Unit)
     }
+
+    override suspend fun getCurrentUserId(): String? = activeSession.value?.user?.id
+
+    override suspend fun getCurrentUserEmail(): String? = activeSession.value?.user?.email
 
     companion object {
         // Shared by UI tests and mock manual QA scenarios.

@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.screens
 
+// Legacy-роут-обертка splash для связки с NavController.
+
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.example.sneakneak.ui.auth.splash.SplashRoute

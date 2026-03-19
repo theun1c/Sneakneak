@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Базовый текстовый input для форм приложения.
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

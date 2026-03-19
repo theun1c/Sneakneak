@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.auth.forgot
 
+// Экран запроса восстановления пароля.
+// При успехе открывает OTP-экран через UiEffect, не выполняя навигацию напрямую из composable.
+
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -69,7 +72,7 @@ class ForgotPasswordViewModel(
             ForgotPasswordUiEvent.ErrorDismissed -> uiState = uiState.copy(dialogMessage = null)
             ForgotPasswordUiEvent.SendClicked -> scope.launch {
                 uiState = uiState.copy(isLoading = true, dialogMessage = null)
-                // TODO(DATA): bind to real recovery email request once AuthRemoteDataSource exists.
+                // Uses real Supabase auth when configured; otherwise falls back to fake repository.
                 when (val result = useCases.sendRecoveryCode(uiState.email)) {
                     is AuthResult.Error -> {
                         uiState = uiState.copy(isLoading = false, dialogMessage = result.message)

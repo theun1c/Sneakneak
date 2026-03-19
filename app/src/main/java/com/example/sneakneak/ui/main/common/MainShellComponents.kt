@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.main.common
 
+// Общий shell авторизованной части: top bar, drawer, bottom nav и обвязка контента экранов.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,12 +29,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.example.sneakneak.di.AppContainer
+import com.example.sneakneak.domain.profile.model.ProfileResult
 import com.example.sneakneak.ui.components.AppCircularIconButton
 import com.example.sneakneak.ui.components.AppIcon
 import com.example.sneakneak.ui.components.AppIconAsset
@@ -95,12 +108,15 @@ fun MainShellScaffold(
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val drawerProfile = rememberDrawerProfile()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = topBarStyle is MainTopBarStyle.MenuTitleAction,
         drawerContent = {
             MainDrawer(
+                userName = drawerProfile.displayName,
+                avatarUrl = drawerProfile.avatarUrl,
                 items = DefaultDrawerItems,
                 onItemClick = {
                     scope.launch { drawerState.close() }
@@ -249,6 +265,8 @@ fun MainTopBar(
 
 @Composable
 fun MainDrawer(
+    userName: String,
+    avatarUrl: String?,
     items: List<MainDrawerItem>,
     onItemClick: (MainDrawerItem) -> Unit,
     onLogoutClick: () -> Unit,
@@ -265,12 +283,13 @@ fun MainDrawer(
                 .verticalScroll(rememberScrollState()),
         ) {
             ProfileAvatar(
-                name = "ЭК",
+                name = userName,
+                imageUrl = avatarUrl,
                 size = 76.dp,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Эмануэль Кверти",
+                text = userName,
                 style = MaterialTheme.typography.headlineLarge,
                 color = AppColors.Surface,
             )
@@ -308,6 +327,65 @@ fun MainDrawer(
             }
         }
     }
+}
+
+private data class DrawerProfileUi(
+    val displayName: String,
+    val avatarUrl: String?,
+)
+
+@Composable
+private fun rememberDrawerProfile(): DrawerProfileUi {
+    var profile by remember { mutableStateOf(DrawerProfileUi(displayName = "Пользователь", avatarUrl = null)) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
+
+    suspend fun loadProfileState() {
+        // Drawer берет имя/аватар из profile use case, чтобы sidebar всегда совпадал с экраном Profile.
+        val fallbackName = runCatching {
+            AppContainer.authUseCases.getCurrentUserEmail()
+                ?.substringBefore("@")
+                ?.takeIf { it.isNotBlank() }
+        }.getOrNull() ?: "Пользователь"
+
+        when (val result = AppContainer.profileUseCases.getCurrentUserProfile()) {
+            is ProfileResult.Error -> {
+                profile = profile.copy(displayName = fallbackName)
+            }
+
+            is ProfileResult.Success -> {
+                val fullName = listOf(result.data.firstname, result.data.lastname)
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+                    .joinToString(" ")
+                profile = DrawerProfileUi(
+                    displayName = fullName.ifBlank {
+                        result.data.email?.substringBefore("@")
+                            ?.takeIf { it.isNotBlank() }
+                            ?: fallbackName
+                    },
+                    avatarUrl = result.data.photo,
+                )
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        loadProfileState()
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                scope.launch { loadProfileState() }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    return profile
 }
 
 @Composable

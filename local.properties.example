@@ -1,0 +1,3 @@
+# Add these keys to your existing `local.properties` (keep sdk.dir) and fill real values.
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your_public_anon_key

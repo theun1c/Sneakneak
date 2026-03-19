@@ -1,7 +1,11 @@
 package com.example.sneakneak.ui.components
 
+// Универсальная primary CTA-кнопка с поддержкой loading состояния.
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,22 +27,25 @@ fun PrimaryButton(
     loading: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
-        enabled = enabled && !loading,
-        modifier = modifier.fillMaxWidth(),
+        onClick = { if (!loading) onClick() },
+        enabled = enabled,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
         shape = MaterialTheme.shapes.medium,
-        contentPadding = PaddingValues(vertical = 18.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = AppColors.Primary,
             contentColor = AppColors.OnPrimary,
-            disabledContainerColor = AppColors.PrimaryDark,
+            disabledContainerColor = if (loading) AppColors.Primary else AppColors.PrimaryDark,
             disabledContentColor = AppColors.OnPrimary,
         ),
     ) {
         if (loading) {
             CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
                 color = AppColors.OnPrimary,
-                strokeWidth = 2.dp,
+                strokeWidth = 1.8.dp,
             )
         } else {
             Text(

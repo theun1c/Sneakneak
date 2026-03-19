@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Универсальная карточка товара для Home/Catalog/Favorite.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,19 +26,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
 import com.example.sneakneak.ui.assets.DesignAssets
 import com.example.sneakneak.ui.assets.DesignPngAsset
 import com.example.sneakneak.ui.assets.HomeVisualTuning
 import com.example.sneakneak.ui.theme.AppColors
 
 // Reusable catalog/home/favorite card.
-// The card is UI-first for now; product actions still resolve against mock state until
-// product/favorite repositories replace the temporary source of truth.
+// Catalog/Home now pass real product data; favorite toggle is still local until Favorite feature is connected.
 @Composable
 fun ProductCard(
     title: String,
     price: String,
     modifier: Modifier = Modifier,
+    imageUrl: String? = null,
     imageAssetPath: String? = DesignAssets.CardItem,
     isBestSeller: Boolean = true,
     isFavorite: Boolean = false,
@@ -68,35 +71,25 @@ fun ProductCard(
                         .background(AppColors.Surface, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (imageAssetPath != null) {
-                        DesignPngAsset(
-                            assetPath = imageAssetPath,
-                            contentDescription = title,
-                            modifier = Modifier
-                                .size(HomeVisualTuning.productImageSizeDp.dp)
-                                .offset(x = HomeVisualTuning.productImageOffsetXDp.dp),
-                            contentScale = ContentScale.Fit,
-                        )
-                    } else {
-                        AppIcon(
-                            asset = AppIconAsset.Bag,
-                            contentDescription = title,
-                            tint = AppColors.Primary,
-                            modifier = Modifier.size(48.dp),
-                        )
-                    }
+                    ProductImage(
+                        title = title,
+                        imageUrl = imageUrl,
+                        fallbackAssetPath = imageAssetPath,
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            if (isBestSeller) {
-                Text(
-                    text = "BEST SELLER",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = AppColors.Primary,
-                )
-            }
+            Text(
+                text = "BEST SELLER",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isBestSeller) {
+                    AppColors.Primary
+                } else {
+                    AppColors.Primary.copy(alpha = 0f)
+                },
+            )
 
             Spacer(modifier = Modifier.height(6.dp))
 
@@ -137,4 +130,49 @@ fun ProductCard(
             }
         }
     }
+}
+
+@Composable
+private fun ProductImage(
+    title: String,
+    imageUrl: String?,
+    fallbackAssetPath: String?,
+) {
+    val imageModifier = Modifier
+        .size(HomeVisualTuning.productImageSizeDp.dp)
+        .offset(x = HomeVisualTuning.productImageOffsetXDp.dp)
+
+    @Composable
+    fun fallback() {
+        if (fallbackAssetPath != null) {
+            DesignPngAsset(
+                assetPath = fallbackAssetPath,
+                contentDescription = title,
+                modifier = imageModifier,
+                contentScale = ContentScale.Fit,
+            )
+        } else {
+            AppIcon(
+                asset = AppIconAsset.Bag,
+                contentDescription = title,
+                tint = AppColors.Primary,
+                modifier = Modifier.size(48.dp),
+            )
+        }
+    }
+
+    if (imageUrl.isNullOrBlank()) {
+        // Если URL не построен или недоступен, показываем placeholder без падения UI.
+        fallback()
+        return
+    }
+
+    SubcomposeAsyncImage(
+        model = imageUrl,
+        contentDescription = title,
+        modifier = imageModifier,
+        contentScale = ContentScale.Fit,
+        loading = { fallback() },
+        error = { fallback() },
+    )
 }

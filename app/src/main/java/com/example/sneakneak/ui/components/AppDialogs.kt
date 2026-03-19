@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.components
 
+// Базовые диалоги приложения (успех/информация/ошибка).
+// Используются экранами для обязательного показа ошибок через modal window.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
