@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Поисковая строка для Home/Catalog с опциональной кнопкой фильтра.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
