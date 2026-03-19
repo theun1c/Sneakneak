@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.auth.splash
 
+// Splash-экран: короткая анимация + проверка текущей сессии для выбора стартового маршрута.
+
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -54,8 +56,7 @@ class SplashViewModel(
     fun onEvent(event: SplashUiEvent) {
         when (event) {
             SplashUiEvent.Started -> {
-                // TODO(DATA): once session observation becomes asynchronous/reactive, keep the same
-                // effect contract but source it from real auth state instead of fake memory state.
+                // TODO(DATA): migrate to reactive session stream so Splash can react to async restore.
                 uiEffect = if (observeSessionUseCase().value == null) {
                     SplashUiEffect.NavigateToSignIn
                 } else {
