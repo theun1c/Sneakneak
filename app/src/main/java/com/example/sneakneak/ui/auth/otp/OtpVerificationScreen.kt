@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.auth.otp
 
+// Экран проверки recovery OTP.
+// Поддерживает таймер повторной отправки и error-state для всех ячеек кода.
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -89,7 +92,7 @@ class OtpViewModel(
             OtpUiEvent.ResendClicked -> scope.launch {
                 if (!uiState.canResend) return@launch
                 uiState = uiState.copy(isLoading = true, dialogMessage = null)
-                // TODO(DATA): resend should use the same backend recovery pipeline as Forgot Password.
+                // Reuses the same recovery endpoint as Forgot Password.
                 when (val result = useCases.sendRecoveryCode(uiState.email)) {
                     is AuthResult.Error -> {
                         uiState = uiState.copy(isLoading = false, dialogMessage = result.message)
@@ -109,7 +112,7 @@ class OtpViewModel(
 
             OtpUiEvent.ContinueClicked -> scope.launch {
                 uiState = uiState.copy(isLoading = true, dialogMessage = null, isCodeError = false)
-                // TODO(DATA): replace fake OTP verification with server validation.
+                // Uses Supabase OTP verification when configured; fake implementation remains as fallback.
                 when (val result = useCases.verifyRecoveryCode(uiState.email, uiState.code)) {
                     is AuthResult.Error -> {
                         uiState = uiState.copy(
@@ -197,7 +200,9 @@ fun OtpScreen(
             value = state.code,
             onValueChange = { onEvent(OtpUiEvent.CodeChanged(it)) },
             isError = state.isCodeError,
-            activeIndex = state.code.length.coerceAtMost(5),
+            // Для текущей Supabase recovery-конфигурации в проекте используется 8-значный токен.
+            length = 8,
+            activeIndex = state.code.length.coerceAtMost(7),
         )
         Spacer(modifier = Modifier.height(12.dp))
         if (state.canResend) {
