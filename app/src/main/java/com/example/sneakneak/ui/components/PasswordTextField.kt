@@ -1,5 +1,7 @@
 package com.example.sneakneak.ui.components
 
+// Обертка над AppTextField для пароля с управлением видимостью.
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
