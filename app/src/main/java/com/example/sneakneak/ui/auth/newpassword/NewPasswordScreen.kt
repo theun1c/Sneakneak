@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.auth.newpassword
 
+// Экран установки нового пароля после OTP-верификации.
+// ViewModel держит только state/effect и делегирует бизнес-правила domain use case.
+
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -54,7 +57,6 @@ sealed interface NewPasswordUiEffect {
 }
 
 class NewPasswordViewModel(
-    private val email: String,
     private val useCases: AuthUseCases,
     dispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : ViewModel() {
@@ -80,8 +82,7 @@ class NewPasswordViewModel(
             NewPasswordUiEvent.DialogDismissed -> uiState = uiState.copy(dialogMessage = null)
             NewPasswordUiEvent.SaveClicked -> scope.launch {
                 uiState = uiState.copy(isLoading = true, dialogMessage = null)
-                // TODO(DATA): bind to repository-backed password update after recovery session is real.
-                when (val result = useCases.updatePassword(email, uiState.password, uiState.confirmPassword)) {
+                when (val result = useCases.updatePassword(uiState.password, uiState.confirmPassword)) {
                     is AuthResult.Error -> {
                         uiState = uiState.copy(isLoading = false, dialogMessage = result.message)
                     }
@@ -108,7 +109,7 @@ class NewPasswordViewModel(
 @Composable
 fun NewPasswordRoute(
     email: String,
-    viewModel: NewPasswordViewModel = remember(email) { NewPasswordViewModel(email, AppContainer.authUseCases) },
+    viewModel: NewPasswordViewModel = remember(email) { NewPasswordViewModel(AppContainer.authUseCases) },
     onBack: () -> Unit,
     onNavigateToSignIn: () -> Unit,
 ) {
