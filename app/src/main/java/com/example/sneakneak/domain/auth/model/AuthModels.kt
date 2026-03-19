@@ -1,5 +1,7 @@
 package com.example.sneakneak.domain.auth.model
 
+// Domain-модели auth feature.
+// Они не зависят от Supabase SDK и используются во всех слоях выше data.
 data class AuthUser(
     val id: String,
     val name: String,
