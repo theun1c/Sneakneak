@@ -2,6 +2,8 @@ package com.example.sneakneak.ui.auth
 
 import com.example.sneakneak.data.auth.FakeAuthRepository
 import com.example.sneakneak.domain.auth.usecase.AuthUseCases
+import com.example.sneakneak.domain.auth.usecase.GetCurrentUserEmailUseCase
+import com.example.sneakneak.domain.auth.usecase.GetCurrentUserIdUseCase
 import com.example.sneakneak.domain.auth.usecase.ObserveSessionUseCase
 import com.example.sneakneak.domain.auth.usecase.SendRecoveryCodeUseCase
 import com.example.sneakneak.domain.auth.usecase.SignInWithEmailUseCase
@@ -42,6 +44,8 @@ class AuthFlowViewModelTest {
             updatePassword = UpdatePasswordUseCase(repository),
             observeSession = ObserveSessionUseCase(repository),
             signOut = SignOutUseCase(repository),
+            getCurrentUserId = GetCurrentUserIdUseCase(repository),
+            getCurrentUserEmail = GetCurrentUserEmailUseCase(repository),
         )
     }
 
@@ -139,7 +143,7 @@ class AuthFlowViewModelTest {
         otpViewModel.onEvent(OtpUiEvent.CodeChanged(FakeAuthRepository.DEFAULT_RECOVERY_CODE))
         otpViewModel.onEvent(OtpUiEvent.ContinueClicked)
 
-        val viewModel = NewPasswordViewModel("demo@sneakneak.com", useCases, Dispatchers.Unconfined)
+        val viewModel = NewPasswordViewModel(useCases, Dispatchers.Unconfined)
         viewModel.onEvent(NewPasswordUiEvent.PasswordChanged("updatedpass123"))
         viewModel.onEvent(NewPasswordUiEvent.ConfirmPasswordChanged("updatedpass123"))
         viewModel.onEvent(NewPasswordUiEvent.SaveClicked)
