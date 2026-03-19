@@ -1,5 +1,8 @@
 package com.example.sneakneak.ui.screens
 
+// Legacy заглушка экрана main из раннего UI-этапа.
+// Оставлена для совместимости, основной поток сейчас идет через ui/main/MainNavGraph.
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
